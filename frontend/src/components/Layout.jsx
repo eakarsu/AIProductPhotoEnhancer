@@ -19,12 +19,17 @@ import {
   Gift,
   RotateCcw,
   User,
-  Settings
+  Settings,
+  Eye,
+  Layers
 } from 'lucide-react';
 
 const navItems = [
   { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { path: '/products', label: 'Products', icon: Package },
+  { type: 'divider', label: 'Vision AI' },
+  { path: '/photo-analysis', label: 'Photo Analysis AI', icon: Eye },
+  { path: '/batch-analysis', label: 'Batch Analysis', icon: Layers },
   { type: 'divider', label: 'Photo Tools' },
   { path: '/background-removal', label: 'Background Removal', icon: Eraser },
   { path: '/enhancements', label: 'Enhancements', icon: Sparkles },

@@ -19,9 +19,27 @@ import SizeRecommender from './pages/SizeRecommender';
 import GiftSuggester from './pages/GiftSuggester';
 import ReturnPredictor from './pages/ReturnPredictor';
 import UserProfile from './pages/UserProfile';
+import PhotoAnalysis from './pages/PhotoAnalysis';
+import BatchAnalysis from './pages/BatchAnalysis';
 import Layout from './components/Layout';
 import { authAPI } from './services/api';
 
+// // === Batch 06 Gaps & Frontend Mounts ===
+import CFAiPhotoEnhancementPipelinePage from './pages/CFAiPhotoEnhancementPipelinePage';
+import CFComputerVisionProductSizingPage from './pages/CFComputerVisionProductSizingPage';
+import CFReturnRiskPredictionPage from './pages/CFReturnRiskPredictionPage';
+import CFMultiVariantGenerationPage from './pages/CFMultiVariantGenerationPage';
+import CFCompetitiveVisualIntelligencePage from './pages/CFCompetitiveVisualIntelligencePage';
+import GapAllTheAiPage from './pages/GapAllTheAiPage';
+import GapNoAutoPage from './pages/GapNoAutoPage';
+import GapNoCompetitorPage from './pages/GapNoCompetitorPage';
+import GapNoIntegrationWithEPage from './pages/GapNoIntegrationWithEPage';
+import GapNoBatchProcessingEndpointSinglePage from './pages/GapNoBatchProcessingEndpointSinglePage';
+import GapNoIntegrationWithImageCdnDeliveryOptimizatioPage from './pages/GapNoIntegrationWithImageCdnDeliveryOptimizatioPage';
+import GapLimitedAnalyticsPhotoPerformanceTrackingPage from './pages/GapLimitedAnalyticsPhotoPerformanceTrackingPage';
+import GapNoNotificationsModuleGrep0Page from './pages/GapNoNotificationsModuleGrep0Page';
+import GapNoAuditLoggingGrep0Page from './pages/GapNoAuditLoggingGrep0Page';
+import GapNoWebhooksForImagePage from './pages/GapNoWebhooksForImagePage';
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -95,7 +113,26 @@ function App() {
                         <Route path="/gift-suggester" element={<GiftSuggester />} />
                         <Route path="/return-predictor" element={<ReturnPredictor />} />
                         <Route path="/profile" element={<UserProfile />} />
-                      </Routes>
+                        <Route path="/photo-analysis" element={<PhotoAnalysis />} />
+                        <Route path="/batch-analysis" element={<BatchAnalysis />} />
+                      
+          {/* // === Batch 06 Gaps & Frontend Mounts === */}
+          <Route path="/cf-ai-photo-enhancement-pipeline" element={<CFAiPhotoEnhancementPipelinePage />} />
+          <Route path="/cf-computer-vision-product-sizing" element={<CFComputerVisionProductSizingPage />} />
+          <Route path="/cf-return-risk-prediction" element={<CFReturnRiskPredictionPage />} />
+          <Route path="/cf-multi-variant-generation" element={<CFMultiVariantGenerationPage />} />
+          <Route path="/cf-competitive-visual-intelligence" element={<CFCompetitiveVisualIntelligencePage />} />
+          <Route path="/gap-all-the-ai" element={<GapAllTheAiPage />} />
+          <Route path="/gap-no-auto" element={<GapNoAutoPage />} />
+          <Route path="/gap-no-competitor" element={<GapNoCompetitorPage />} />
+          <Route path="/gap-no-integration-with-e" element={<GapNoIntegrationWithEPage />} />
+          <Route path="/gap-no-batch-processing-endpoint-single" element={<GapNoBatchProcessingEndpointSinglePage />} />
+          <Route path="/gap-no-integration-with-image-cdn-delivery-optimizatio" element={<GapNoIntegrationWithImageCdnDeliveryOptimizatioPage />} />
+          <Route path="/gap-limited-analytics-photo-performance-tracking" element={<GapLimitedAnalyticsPhotoPerformanceTrackingPage />} />
+          <Route path="/gap-no-notifications-module-grep-0" element={<GapNoNotificationsModuleGrep0Page />} />
+          <Route path="/gap-no-audit-logging-grep-0" element={<GapNoAuditLoggingGrep0Page />} />
+          <Route path="/gap-no-webhooks-for-image" element={<GapNoWebhooksForImagePage />} />
+        </Routes>
                     </ErrorBoundary>
                   </Layout>
                 ) : (

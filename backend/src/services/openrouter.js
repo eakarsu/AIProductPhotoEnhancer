@@ -12,9 +12,10 @@ const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 export class OpenRouterService {
   constructor() {
     this.apiKey = process.env.OPENROUTER_API_KEY;
-    this.model = process.env.OPENROUTER_MODEL || 'anthropic/claude-haiku-4.5';
+    this.model = 'anthropic/claude-3-5-sonnet-20241022';
   }
-
+  parseAIJsonContent(c){try{return JSON.parse(c)}catch(_){}const f=c.match(/```(?:json)?\s*([\s\S]*?)```/);if(f){try{return JSON.parse(f[1].trim())}catch(_){}}const o=c.match(/(\{[\s\S]*\}|\[[\s\S]*\])/);if(o){try{return JSON.parse(o[1])}catch(_){}}return null}
+  async makeVisionRequest(b64,mime,sys,usr){const r=await fetch(OPENROUTER_API_URL,{method:'POST',headers:{'Authorization':`Bearer ${this.apiKey}`,'Content-Type':'application/json','HTTP-Referer':'http://localhost:3000','X-Title':'AI Product Photo Enhancer'},body:JSON.stringify({model:this.model,messages:[{role:'system',content:sys},{role:'user',content:[{type:'image_url',image_url:{url:`data:${mime};base64,${b64}`}},{type:'text',text:usr}]}],max_tokens:4096})});if(!r.ok){const e=await r.json();throw new Error(e.error?.message||'Vision API failed')}const d=await r.json();const c=d.choices[0]?.message?.content||'';const p=this.parseAIJsonContent(c);return{success:true,data:p||{text:c},rawResponse:c,model:d.model,usage:d.usage}}
   async makeRequest(messages, options = {}) {
     try {
       const response = await fetch(OPENROUTER_API_URL, {
@@ -645,3 +646,4 @@ export class OpenRouterService {
 }
 
 export default new OpenRouterService();
+ OpenRouterService();

@@ -191,4 +191,14 @@ export const returnPredictorAPI = {
   analyze: (id, data) => api.post(`/return-predictor/${id}/analyze`, data)
 };
 
+// Vision AI Photos
+export const photosAPI = {
+  analyze: (id) => api.post(`/photos/${id}/analyze`),
+  backgroundAnalysis: (id) => api.post(`/photos/${id}/background-analysis`),
+  generateAltText: (id) => api.post(`/photos/${id}/generate-alt-text`),
+  batchAnalyze: (product_ids) => api.post('/photos/batch-analyze', { product_ids }),
+  generateDescription: (id) => api.post(`/photos/${id}/generate-description`),
+  getAIResults: (page = 1, limit = 20) => api.get(`/photos/ai-results?page=${page}&limit=${limit}`),
+};
+
 export default api;

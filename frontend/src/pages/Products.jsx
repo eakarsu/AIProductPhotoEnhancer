@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import {
   Package, Plus, Edit2, Trash2, Loader2, Save, Image as ImageIcon, Search, X,
   ArrowUpDown, ArrowUp, ArrowDown, Download, CheckSquare, Square, ChevronDown,
-  Filter
+  Filter, Sparkles, Star
 } from 'lucide-react';
+import { photosAPI, qualityAssessmentAPI } from '../services/api';
 import { productsAPI } from '../services/api';
 import Modal from '../components/Modal';
 import ImageUpload from '../components/ImageUpload';
@@ -41,12 +42,26 @@ function Products() {
   // Bulk
   const [selectedIds, setSelectedIds] = useState(new Set());
 
-  useEffect(() => { fetchProducts(); }, []);
+  // Quality scores keyed by product_id
+  const [qualityScores, setQualityScores] = useState({});
+
+  useEffect(() => { fetchProducts(); fetchQualityScores(); }, []);
+
+  const fetchQualityScores = async () => {
+    try {
+      const res = await qualityAssessmentAPI.getAll();
+      const scores = {};
+      const list = Array.isArray(res.data) ? res.data : (res.data?.data || []);
+      list.forEach(qa => { if (qa.product_id && qa.overall_score != null) scores[qa.product_id] = qa.overall_score; });
+      setQualityScores(scores);
+    } catch { /* non-critical */ }
+  };
 
   const fetchProducts = async () => {
     try {
       const response = await productsAPI.getAll();
-      setProducts(response.data);
+      // Handle both paginated {data, pagination} and legacy flat array responses
+      setProducts(Array.isArray(response.data) ? response.data : (response.data?.data || []));
     } catch (error) {
       toast.error('Failed to load products');
     } finally {
@@ -317,6 +332,12 @@ function Products() {
                     <button onClick={(e) => handleEditProduct(product, e)} className="p-2 bg-slate-900/80 text-slate-400 hover:text-sky-400 rounded-lg"><Edit2 size={16} /></button>
                     <button onClick={(e) => { e.stopPropagation(); handleDeleteProduct(product, e); }} className="p-2 bg-slate-900/80 text-slate-400 hover:text-rose-400 rounded-lg"><Trash2 size={16} /></button>
                   </div>
+                  {qualityScores[product.id] != null && (
+                    <div className={`absolute bottom-2 right-2 flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold shadow ${qualityScores[product.id] >= 80 ? 'bg-emerald-500/90 text-white' : qualityScores[product.id] >= 60 ? 'bg-amber-500/90 text-white' : 'bg-rose-500/90 text-white'}`}>
+                      <Star size={10} fill="currentColor" />
+                      {qualityScores[product.id]}
+                    </div>
+                  )}
                 </div>
                 <div className="p-4">
                   <h3 className="text-lg font-semibold text-white truncate">{product.name}</h3>
@@ -348,7 +369,14 @@ function Products() {
                 <div className="flex items-start justify-between">
                   <div>
                     <h3 className="text-xl font-semibold text-white">{selectedProduct.name}</h3>
-                    <span className="inline-block px-3 py-1 mt-2 text-sm bg-sky-500/20 text-sky-400 rounded-full">{selectedProduct.category || 'Uncategorized'}</span>
+                    <div className="flex items-center gap-2 mt-2">
+                      <span className="inline-block px-3 py-1 text-sm bg-sky-500/20 text-sky-400 rounded-full">{selectedProduct.category || 'Uncategorized'}</span>
+                      {qualityScores[selectedProduct.id] != null && (
+                        <span className={`flex items-center gap-1 px-3 py-1 text-sm font-semibold rounded-full ${qualityScores[selectedProduct.id] >= 80 ? 'bg-emerald-500/20 text-emerald-400' : qualityScores[selectedProduct.id] >= 60 ? 'bg-amber-500/20 text-amber-400' : 'bg-rose-500/20 text-rose-400'}`}>
+                          <Star size={12} fill="currentColor" /> Quality: {qualityScores[selectedProduct.id]}/100
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <div className="flex gap-2">
                     <button onClick={(e) => { setIsDetailModalOpen(false); handleEditProduct(selectedProduct, e); }}

@@ -8,15 +8,20 @@ const router = express.Router();
 // Get all lifestyle shots
 router.get('/', authenticateToken, async (req, res) => {
   try {
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20));
+    const offset = (page - 1) * limit;
+    const countResult = await pool.query(`SELECT COUNT(*) FROM lifestyle_shots ls JOIN products p ON ls.product_id = p.id WHERE p.user_id = $1`, [req.user.id]);
+    const total = parseInt(countResult.rows[0].count);
     const result = await pool.query(
       `SELECT ls.*, p.name as product_name, p.category
        FROM lifestyle_shots ls
        JOIN products p ON ls.product_id = p.id
        WHERE p.user_id = $1
-       ORDER BY ls.created_at DESC`,
-      [req.user.id]
+       ORDER BY ls.created_at DESC LIMIT $2 OFFSET $3`,
+      [req.user.id, limit, offset]
     );
-    res.json(result.rows);
+    res.json({ data: result.rows, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } });
   } catch (error) {
     console.error('Get lifestyle shots error:', error);
     res.status(500).json({ error: 'Server error' });

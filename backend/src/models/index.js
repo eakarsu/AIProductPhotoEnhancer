@@ -211,6 +211,19 @@ export async function initializeDatabase() {
       )
     `);
 
+    // AI Results persistence table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS ai_results (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+        endpoint VARCHAR(100) NOT NULL,
+        product_id INTEGER REFERENCES products(id) ON DELETE SET NULL,
+        result TEXT,
+        result_json JSONB,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
     console.log('Database tables initialized successfully');
   } catch (error) {
     console.error('Error initializing database:', error);

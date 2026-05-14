@@ -190,19 +190,20 @@ function Dashboard() {
         returnPredictorAPI.getAll()
       ]);
 
+      const getLen = (r) => r.data?.pagination?.total ?? (Array.isArray(r.data) ? r.data.length : (r.data?.data?.length ?? 0));
       setStats({
-        products: products.data.length,
-        backgroundRemovals: bgRemovals.data.length,
-        enhancements: enhancements.data.length,
-        lifestyleShots: lifestyle.data.length,
-        colorAnalyses: colors.data.length,
-        qualityAssessments: quality.data.length,
-        productDescriptions: descriptions.data.length,
-        sizeReferences: sizeRefs.data.length,
-        view360s: views360.data.length,
-        sizeRecommendations: sizeRecs.data.length,
-        giftSuggestions: gifts.data.length,
-        returnPredictions: returns.data.length
+        products: getLen(products),
+        backgroundRemovals: getLen(bgRemovals),
+        enhancements: getLen(enhancements),
+        lifestyleShots: getLen(lifestyle),
+        colorAnalyses: getLen(colors),
+        qualityAssessments: getLen(quality),
+        productDescriptions: getLen(descriptions),
+        sizeReferences: getLen(sizeRefs),
+        view360s: getLen(views360),
+        sizeRecommendations: getLen(sizeRecs),
+        giftSuggestions: getLen(gifts),
+        returnPredictions: getLen(returns)
       });
     } catch (error) {
       console.error('Error fetching stats:', error);

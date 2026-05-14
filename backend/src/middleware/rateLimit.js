@@ -49,3 +49,35 @@ export const apiRateLimit = rateLimit({
   max: 200,
   message: 'Too many requests, please slow down.'
 });
+
+// AI-specific rate limiter: 20 requests per hour per user/IP
+const aiRateLimitStore = new Map();
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, data] of aiRateLimitStore.entries()) {
+    if (now - data.windowStart > 60 * 60 * 1000) aiRateLimitStore.delete(key);
+  }
+}, 30 * 60 * 1000);
+
+export function aiRateLimiter(req, res, next) {
+  const userId = req.user?.id || req.ip;
+  const key = `ai:${userId}`;
+  const now = Date.now();
+  const windowMs = 60 * 60 * 1000;
+  const maxRequests = 20;
+
+  let record = aiRateLimitStore.get(key);
+  if (!record || now - record.windowStart > windowMs) {
+    record = { count: 0, windowStart: now };
+    aiRateLimitStore.set(key, record);
+  }
+  record.count++;
+
+  res.set('X-RateLimit-Limit', String(maxRequests));
+  res.set('X-RateLimit-Remaining', String(Math.max(0, maxRequests - record.count)));
+
+  if (record.count > maxRequests) {
+    return res.status(429).json({ error: 'AI rate limit exceeded. Max 20 requests per hour.' });
+  }
+  next();
+}

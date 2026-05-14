@@ -35,8 +35,8 @@ function GiftSuggester() {
   const fetchData = async () => {
     try {
       const [itemsRes, productsRes] = await Promise.all([giftSuggesterAPI.getAll(), productsAPI.getAll()]);
-      setItems(itemsRes.data);
-      setProducts(productsRes.data);
+      setItems(Array.isArray(itemsRes.data) ? itemsRes.data : (itemsRes.data?.data || []));
+      setProducts(Array.isArray(productsRes.data) ? productsRes.data : (productsRes.data?.data || []));
     } catch (error) {
       toast.error('Failed to load data');
     } finally {
