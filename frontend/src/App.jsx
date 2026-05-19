@@ -40,6 +40,7 @@ import GapLimitedAnalyticsPhotoPerformanceTrackingPage from './pages/GapLimitedA
 import GapNoNotificationsModuleGrep0Page from './pages/GapNoNotificationsModuleGrep0Page';
 import GapNoAuditLoggingGrep0Page from './pages/GapNoAuditLoggingGrep0Page';
 import GapNoWebhooksForImagePage from './pages/GapNoWebhooksForImagePage';
+import CustomViewsPage from './pages/CustomViewsPage';
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -132,6 +133,7 @@ function App() {
           <Route path="/gap-no-notifications-module-grep-0" element={<GapNoNotificationsModuleGrep0Page />} />
           <Route path="/gap-no-audit-logging-grep-0" element={<GapNoAuditLoggingGrep0Page />} />
           <Route path="/gap-no-webhooks-for-image" element={<GapNoWebhooksForImagePage />} />
+          <Route path="/photo-views" element={<CustomViewsPage />} />
         </Routes>
                     </ErrorBoundary>
                   </Layout>

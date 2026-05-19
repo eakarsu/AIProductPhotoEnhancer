@@ -43,6 +43,8 @@ const navItems = [
   { path: '/size-recommender', label: 'Size Recommender', icon: Users },
   { path: '/gift-suggester', label: 'Gift Suggester', icon: Gift },
   { path: '/return-predictor', label: 'Return Predictor', icon: RotateCcw },
+  { type: 'divider', label: 'Custom Views' },
+  { path: '/photo-views', label: 'Photo Views', icon: Eye },
 ];
 
 function Layout({ children, onLogout }) {

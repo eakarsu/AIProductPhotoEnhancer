@@ -24,6 +24,7 @@ import sizeRecommenderRoutes from './routes/sizeRecommender.js';
 import giftSuggesterRoutes from './routes/giftSuggester.js';
 import returnPredictorRoutes from './routes/returnPredictor.js';
 import photosRoutes from './routes/photos.js';
+import customViewsRoutes from './routes/customViews.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -71,6 +72,7 @@ app.use('/api/size-recommender', sizeRecommenderRoutes);
 app.use('/api/gift-suggester', giftSuggesterRoutes);
 app.use('/api/return-predictor', returnPredictorRoutes);
 app.use('/api/photos', photosRoutes);
+app.use('/api/custom-views', customViewsRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -98,17 +100,17 @@ import('./routes/customFeat04_MultiVariantGeneration.js').then(m => app.use('/ap
 import('./routes/customFeat05_CompetitiveVisualIntelligence.js').then(m => app.use('/api/cf-competitive-visual-intelligence', m.default));
 
 
-// === Batch 06 Gaps & Frontend Mounts ===
-app.use('/api/gap-all-the-ai', require('./routes/gapFeat_all_the_ai'));
-app.use('/api/gap-no-auto', require('./routes/gapFeat_no_auto'));
-app.use('/api/gap-no-competitor', require('./routes/gapFeat_no_competitor'));
-app.use('/api/gap-no-integration-with-e', require('./routes/gapFeat_no_integration_with_e'));
-app.use('/api/gap-no-batch-processing-endpoint-single', require('./routes/gapFeat_no_batch_processing_endpoint_single'));
-app.use('/api/gap-no-integration-with-image-cdn-delivery-optimizatio', require('./routes/gapFeat_no_integration_with_image_cdn_delivery_optimizatio'));
-app.use('/api/gap-limited-analytics-photo-performance-tracking', require('./routes/gapFeat_limited_analytics_photo_performance_tracking'));
-app.use('/api/gap-no-notifications-module-grep-0', require('./routes/gapFeat_no_notifications_module_grep_0'));
-app.use('/api/gap-no-audit-logging-grep-0', require('./routes/gapFeat_no_audit_logging_grep_0'));
-app.use('/api/gap-no-webhooks-for-image', require('./routes/gapFeat_no_webhooks_for_image'));
+// === Batch 06 Gaps & Frontend Mounts (converted from require -> dynamic import) ===
+import('./routes/gapFeat_all_the_ai.js').then(m => app.use('/api/gap-all-the-ai', m.default)).catch(()=>{});
+import('./routes/gapFeat_no_auto.js').then(m => app.use('/api/gap-no-auto', m.default)).catch(()=>{});
+import('./routes/gapFeat_no_competitor.js').then(m => app.use('/api/gap-no-competitor', m.default)).catch(()=>{});
+import('./routes/gapFeat_no_integration_with_e.js').then(m => app.use('/api/gap-no-integration-with-e', m.default)).catch(()=>{});
+import('./routes/gapFeat_no_batch_processing_endpoint_single.js').then(m => app.use('/api/gap-no-batch-processing-endpoint-single', m.default)).catch(()=>{});
+import('./routes/gapFeat_no_integration_with_image_cdn_delivery_optimizatio.js').then(m => app.use('/api/gap-no-integration-with-image-cdn-delivery-optimizatio', m.default)).catch(()=>{});
+import('./routes/gapFeat_limited_analytics_photo_performance_tracking.js').then(m => app.use('/api/gap-limited-analytics-photo-performance-tracking', m.default)).catch(()=>{});
+import('./routes/gapFeat_no_notifications_module_grep_0.js').then(m => app.use('/api/gap-no-notifications-module-grep-0', m.default)).catch(()=>{});
+import('./routes/gapFeat_no_audit_logging_grep_0.js').then(m => app.use('/api/gap-no-audit-logging-grep-0', m.default)).catch(()=>{});
+import('./routes/gapFeat_no_webhooks_for_image.js').then(m => app.use('/api/gap-no-webhooks-for-image', m.default)).catch(()=>{});
 
 app.listen(PORT, () => {
       console.log(`\nBackend server running on http://localhost:${PORT}`);
