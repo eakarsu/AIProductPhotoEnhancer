@@ -60,6 +60,9 @@ export const generateToken = (user) => {
   );
 };
 
+// Default export — for modules that use `import authMiddleware from '../middleware/auth.js'`
+export default authenticateToken;
+
 // RBAC middleware - check user role
 export const requireRole = (...roles) => {
   return (req, res, next) => {
