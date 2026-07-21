@@ -25,23 +25,27 @@ import giftSuggesterRoutes from './routes/giftSuggester.js';
 import returnPredictorRoutes from './routes/returnPredictor.js';
 import photosRoutes from './routes/photos.js';
 import customViewsRoutes from './routes/customViews.js';
+import { authenticateToken } from './middleware/auth.js';
+import governanceRouter from './governance/router.js';
+import runtime from './governance/runtime.cjs';
+import provider from './governance/providerGate.cjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 dotenv.config({ path: join(__dirname, '../../.env') });
+runtime.validateRuntime();
 
 const app = express();
 const PORT = process.env.BACKEND_PORT || 3001;
 
 // Middleware
 app.use(helmet());
-app.use(cors({
-  origin: process.env.CLIENT_URL || `http://localhost:${process.env.FRONTEND_PORT || 3000}`,
-  credentials: true
-}));
+const allowedOrigins=String(process.env.CORS_ORIGINS||process.env.CLIENT_URL||`http://localhost:${process.env.FRONTEND_PORT||3000}`).split(',').map(v=>v.trim()).filter(Boolean);
+app.use(cors({origin:(origin,cb)=>!origin||allowedOrigins.includes(origin)?cb(null,true):cb(new Error('Origin not allowed by CORS')),credentials:true}));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+app.use(provider.createProviderGate(['/api/ai','/api/gap','/api/cf','/api/background-removal','/api/enhancements','/api/lifestyle-shots']));
 
 // Apply general rate limit to all API routes
 app.use('/api', apiRateLimit);
@@ -56,6 +60,7 @@ app.get('/api/health', (req, res) => {
 
 // Routes - auth with stricter rate limit
 app.use('/api/auth', authRateLimit, authRoutes);
+app.use('/api', authenticateToken);
 app.use('/api/profile', profileRoutes);
 app.use('/api/products', productsRoutes);
 app.use('/api/background-removal', backgroundRemovalRoutes);
@@ -73,6 +78,7 @@ app.use('/api/gift-suggester', giftSuggesterRoutes);
 app.use('/api/return-predictor', returnPredictorRoutes);
 app.use('/api/photos', photosRoutes);
 app.use('/api/custom-views', customViewsRoutes);
+app.use('/api/governed-product-image-releases', governanceRouter);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -88,8 +94,10 @@ app.use((req, res) => {
 // Initialize database and start server
 async function startServer() {
   try {
-    await initializeDatabase();
-    console.log('Database initialized');
+    if (process.env.ENABLE_LEGACY_SCHEMA_BOOTSTRAP === 'true') {
+      await initializeDatabase();
+      console.log('Legacy database initialization completed by explicit opt-in');
+    }
 
     
 // === Custom Feature Mounts (batch_06) ===
