@@ -2,6 +2,12 @@ import pool from '../config/database.js';
 import { initializeDatabase } from '../models/index.js';
 import bcrypt from 'bcryptjs';
 
+function requireDemoPassword() {
+  const password = process.env.DEMO_PASSWORD || process.env.SEED_DEMO_PASSWORD || process.env.DEMO_SEED_PASSWORD || '';
+  if (password.length < 12 || password.length > 1024) throw new Error('DEMO_PASSWORD must contain 12-1024 characters');
+  return password;
+}
+
 function mockAI(data) {
   return {
     success: true,
@@ -25,7 +31,7 @@ async function seed() {
       try { await client.query('TRUNCATE password_reset_tokens RESTART IDENTITY CASCADE'); } catch {}
 
       // Seed Users
-      const hashedPassword = await bcrypt.hash('password123', 10);
+      const hashedPassword = await bcrypt.hash(requireDemoPassword(), 10);
       const userResult = await client.query(`
         INSERT INTO users (email, password, name, role, email_verified) VALUES
         ($1, $2, 'Demo User', 'admin', true),
@@ -224,9 +230,9 @@ async function seed() {
 
       console.log('\nDatabase seeding completed!');
       console.log('Login credentials:');
-      console.log('  demo@example.com / password123 (admin)');
-      console.log('  admin@example.com / password123 (admin)');
-      console.log('  viewer@example.com / password123 (user)');
+      console.log('Demo login users provisioned from the local environment.');
+      console.log('Demo login users provisioned from the local environment.');
+      console.log('Demo login users provisioned from the local environment.');
 
     } finally {
       client.release();
