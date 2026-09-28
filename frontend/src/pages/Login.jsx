@@ -178,7 +178,7 @@ function Login({ onLogin }) {
                   className="w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium rounded-xl transition-all flex items-center justify-center gap-2"
                 >
                   <Sparkles size={18} className="text-amber-400" />
-                  Use Demo Credentials
+                  Auto Fill Demo Credentials
                 </button>
                 <div className="text-center">
                   <Link to="/password-reset" className="text-sm text-slate-400 hover:text-sky-400">
