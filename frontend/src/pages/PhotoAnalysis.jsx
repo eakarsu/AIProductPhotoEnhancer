@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Eye, Sparkles, Loader2, Image as ImageIcon, RefreshCw, Tag, FileText, Layers } from 'lucide-react';
 import { productsAPI, photosAPI } from '../services/api';
 import { useToast } from '../components/Toast';
+import AIReport from '../components/AIReport';
 
 function ScoreBadge({ score, label }) {
   const color = score >= 80 ? 'text-emerald-400' : score >= 60 ? 'text-amber-400' : 'text-rose-400';
@@ -44,7 +45,7 @@ export default function PhotoAnalysis() {
 
   useEffect(() => {
     productsAPI.getAll().then(r => {
-      const list = Array.isArray(r.data) ? r.data : (r.data?.data || []);
+      const list = Array.isArray(r.data) ? r.data : (Array.isArray(r.data?.data) ? r.data.data : []);
       setProducts(list);
       if (list.length > 0) setSelectedId(String(list[0].id));
     }).catch(() => toast.error('Failed to load products'));
@@ -331,6 +332,10 @@ export default function PhotoAnalysis() {
           )}
         </div>
       )}
+      {activeTab === 'analyze' && analysis?.analysis && <AIReport response={analysis.analysis} title="Vision analysis details" />}
+      {activeTab === 'alttext' && altText && <AIReport response={altText} title="Alt text details" />}
+      {activeTab === 'background' && bgAnalysis && <AIReport response={bgAnalysis} title="Background analysis details" />}
+      {activeTab === 'description' && description && <AIReport response={description} title="Product description details" />}
     </div>
   );
 }

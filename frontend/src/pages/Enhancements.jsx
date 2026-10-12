@@ -3,6 +3,7 @@ import { Sparkles, Plus, Loader2, Zap, RefreshCw, Save, Edit2, Trash2 } from 'lu
 import { enhancementsAPI, productsAPI } from '../services/api';
 import Modal from '../components/Modal';
 import AIResultDisplay from '../components/AIResultDisplay';
+import NativeAIPresets from '../components/NativeAIPresets';
 import ImagePreview from '../components/ImagePreview';
 import DataTable from '../components/DataTable';
 import { useToast } from '../components/Toast';
@@ -38,21 +39,14 @@ function Enhancements() {
   const [analyzing, setAnalyzing] = useState(false);
   const [formErrors, setFormErrors] = useState({});
 
-  const loadSampleData = () => {
-    setFormData({
-      product_id: products.length > 0 ? products[0].id : '',
-      enhancement_type: 'auto_enhance',
-      image_description: 'A leather handbag photographed indoors with slightly dim lighting. The brown leather texture is visible but could use more contrast and sharpness. Colors appear slightly washed out.'
-    });
-  };
 
   useEffect(() => { fetchData(); }, []);
 
   const fetchData = async () => {
     try {
       const [itemsRes, productsRes] = await Promise.all([enhancementsAPI.getAll(), productsAPI.getAll()]);
-      setItems(Array.isArray(itemsRes.data) ? itemsRes.data : (itemsRes.data?.data || []));
-      setProducts(Array.isArray(productsRes.data) ? productsRes.data : (productsRes.data?.data || []));
+      setItems(Array.isArray(itemsRes.data) ? itemsRes.data : (Array.isArray(itemsRes.data?.data) ? itemsRes.data.data : []));
+      setProducts(Array.isArray(productsRes.data) ? productsRes.data : (Array.isArray(productsRes.data?.data) ? productsRes.data.data : []));
     } catch (error) {
       toast.error('Failed to load data');
     } finally {
@@ -311,10 +305,7 @@ function Enhancements() {
       {/* Create Form Modal */}
       <Modal isOpen={isFormModalOpen} onClose={() => setIsFormModalOpen(false)} title="New Enhancement" size="md">
         <form onSubmit={handleSaveItem} className="space-y-4">
-          <button type="button" onClick={loadSampleData}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-slate-700/50 border border-dashed border-slate-500 text-slate-300 rounded-xl hover:bg-slate-700 hover:border-slate-400 transition-all text-sm">
-            <Zap size={16} /> Load Sample Data
-          </button>
+          <NativeAIPresets page="Enhancements" value={formData} onChange={setFormData} products={products} />
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-2">Select Product *</label>
             <select value={formData.product_id} onChange={(e) => setFormData({ ...formData, product_id: e.target.value })}

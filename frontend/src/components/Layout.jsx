@@ -1,3 +1,4 @@
+import AIReportLibrary from "./AIReportLibrary";
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
@@ -152,7 +153,7 @@ function Layout({ children, onLogout }) {
             </button>
           </div>
         </div>
-      </aside>
+      <AIReportLibrary /></aside>
 
       {/* Overlay */}
       {sidebarOpen && (

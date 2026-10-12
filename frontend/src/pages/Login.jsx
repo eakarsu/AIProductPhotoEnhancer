@@ -32,10 +32,17 @@ function Login({ onLogin }) {
     }
   };
 
-  const fillDemoCredentials = () => {
-    setEmail(import.meta.env.VITE_DEMO_EMAIL || '');
-    setPassword(import.meta.env.VITE_DEMO_PASSWORD || '');
-    setIsRegister(false);
+  const handleDemoLogin = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      const response = await authAPI.demoLogin();
+      onLogin(response.data.token, response.data.user);
+    } catch (err) {
+      setError(err.response?.data?.error || 'Demo login is unavailable.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const toggleMode = () => {
@@ -174,11 +181,13 @@ function Login({ onLogin }) {
             {!isRegister && (
               <>
                 <button
-                  onClick={fillDemoCredentials}
+                  type="button"
+                  onClick={handleDemoLogin}
+                  disabled={loading}
                   className="w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium rounded-xl transition-all flex items-center justify-center gap-2"
                 >
                   <Sparkles size={18} className="text-amber-400" />
-                  Auto Fill Demo Credentials
+                  Log In as Demo
                 </button>
                 <div className="text-center">
                   <Link to="/password-reset" className="text-sm text-slate-400 hover:text-sky-400">

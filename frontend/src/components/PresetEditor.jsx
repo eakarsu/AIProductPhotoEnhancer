@@ -17,7 +17,7 @@ export default function PresetEditor() {
     try {
       const res = await fetch('/api/custom-views/presets');
       const j = await res.json();
-      setPresets(j.presets || []);
+      setPresets(Array.isArray(j.presets) ? j.presets : []);
       setError(null);
     } catch (e) {
       setError(e.message);

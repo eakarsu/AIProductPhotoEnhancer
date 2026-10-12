@@ -21,7 +21,7 @@ function DataTable({
   emptyDescription,
   emptyAction,
   onEmptyAction,
-  pageSize: defaultPageSize = 10,
+  pageSize: defaultPageSize = 15,
   enableSearch = true,
   enableSort = true,
   enableFilter = true,
@@ -38,6 +38,9 @@ function DataTable({
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(defaultPageSize);
+
+  // Keep malformed API payloads out of table operations.
+  data = Array.isArray(data) ? data : [];
 
   // Search
   const searchedData = useMemo(() => {

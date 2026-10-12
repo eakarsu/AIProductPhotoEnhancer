@@ -3,6 +3,7 @@ import { RotateCw, Plus, Loader2, Sparkles, RefreshCw, Save, Edit2, Trash2 } fro
 import { view360API, productsAPI } from '../services/api';
 import Modal from '../components/Modal';
 import AIResultDisplay from '../components/AIResultDisplay';
+import NativeAIPresets from '../components/NativeAIPresets';
 import ImagePreview from '../components/ImagePreview';
 import DataTable from '../components/DataTable';
 import { useToast } from '../components/Toast';
@@ -25,21 +26,14 @@ function View360() {
   const [analyzing, setAnalyzing] = useState(false);
   const [formErrors, setFormErrors] = useState({});
 
-  const loadSampleData = () => {
-    setFormData({
-      product_id: products.length > 0 ? products[0].id : '',
-      frame_count: 36,
-      rotation_speed: 24
-    });
-  };
 
   useEffect(() => { fetchData(); }, []);
 
   const fetchData = async () => {
     try {
       const [itemsRes, productsRes] = await Promise.all([view360API.getAll(), productsAPI.getAll()]);
-      setItems(Array.isArray(itemsRes.data) ? itemsRes.data : (itemsRes.data?.data || []));
-      setProducts(Array.isArray(productsRes.data) ? productsRes.data : (productsRes.data?.data || []));
+      setItems(Array.isArray(itemsRes.data) ? itemsRes.data : (Array.isArray(itemsRes.data?.data) ? itemsRes.data.data : []));
+      setProducts(Array.isArray(productsRes.data) ? productsRes.data : (Array.isArray(productsRes.data?.data) ? productsRes.data.data : []));
     } catch (error) {
       toast.error('Failed to load data');
     } finally {
@@ -290,10 +284,7 @@ function View360() {
       {/* Create Form Modal */}
       <Modal isOpen={isFormModalOpen} onClose={() => setIsFormModalOpen(false)} title="New 360 View" size="md">
         <form onSubmit={handleSaveItem} className="space-y-4">
-          <button type="button" onClick={loadSampleData}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-slate-700/50 border border-dashed border-slate-500 text-slate-300 rounded-xl hover:bg-slate-700 hover:border-slate-400 transition-all text-sm">
-            <Sparkles size={16} /> Load Sample Data
-          </button>
+          <NativeAIPresets page="View360" value={formData} onChange={setFormData} products={products} />
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-2">Select Product *</label>
             <select value={formData.product_id} onChange={(e) => setFormData({ ...formData, product_id: e.target.value })}

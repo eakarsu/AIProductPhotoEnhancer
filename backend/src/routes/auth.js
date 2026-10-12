@@ -6,6 +6,29 @@ import { generateToken, authenticateToken, blacklistToken } from '../middleware/
 
 const router = express.Router();
 
+// The public demo action uses the existing configured account without sending
+// its password to the browser. It never creates or changes an account.
+router.post('/demo-login', async (_req, res) => {
+  if (process.env.NODE_ENV === 'production') return res.status(503).json({ error: 'Demo login is unavailable' });
+  const email = process.env.DEMO_EMAIL;
+  const password = process.env.DEMO_PASSWORD;
+  if (!email || !password) return res.status(503).json({ error: 'Demo login is not configured' });
+  try {
+    const result = await pool.query('SELECT * FROM users WHERE email = $1', [email.trim().toLowerCase()]);
+    const user = result.rows[0];
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+      return res.status(503).json({ error: 'Configured demo account is unavailable' });
+    }
+    res.json({ token: generateToken(user), user: {
+      id: user.id, email: user.email, name: user.name,
+      role: user.role || 'user', email_verified: user.email_verified || false
+    } });
+  } catch (error) {
+    console.error('Demo login error:', error);
+    res.status(500).json({ error: 'Demo login failed' });
+  }
+});
+
 // Login
 router.post('/login', async (req, res) => {
   try {

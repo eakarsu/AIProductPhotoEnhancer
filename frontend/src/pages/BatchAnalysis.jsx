@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Layers, Sparkles, Loader2, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import { productsAPI, photosAPI } from '../services/api';
 import { useToast } from '../components/Toast';
+import AIReport from '../components/AIReport';
 
 export default function BatchAnalysis() {
   const toast = useToast();
@@ -13,7 +14,7 @@ export default function BatchAnalysis() {
 
   useEffect(() => {
     productsAPI.getAll().then(r => {
-      const list = Array.isArray(r.data) ? r.data : (r.data?.data || []);
+      const list = Array.isArray(r.data) ? r.data : (Array.isArray(r.data?.data) ? r.data.data : []);
       setProducts(list.filter(p => p.original_image));
     }).catch(() => toast.error('Failed to load products')).finally(() => setFetchingProducts(false));
   }, []);
@@ -170,6 +171,7 @@ export default function BatchAnalysis() {
           </div>
         </div>
       )}
+      {results && <AIReport response={results} title="Batch analysis details" />}
     </div>
   );
 }

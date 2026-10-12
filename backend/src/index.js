@@ -1,3 +1,8 @@
+import { authenticateToken as aiWorkspaceDependency1 } from "./middleware/auth.js";
+import aiWorkspaceDependency2 from "./config/database.js";
+import aiWorkspaceDependency3 from "../aiWorkspaceAdapters.cjs";
+import aiWorkspaceDependency4 from "../aiWorkspace.cjs";
+import { readFileSync as readAIWorkspaceFile } from 'node:fs';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -81,14 +86,18 @@ app.use('/api/custom-views', customViewsRoutes);
 app.use('/api/governed-product-image-releases', governanceRouter);
 
 // Error handling middleware
+
+// Advisory AI reports only; native execution and approval routes stay unchanged.
+const aiWorkspaceSupport = aiWorkspaceDependency3;
+const aiWorkspaceFeatures = JSON.parse(readAIWorkspaceFile(new URL("../aiWorkspaceFeatures.json", import.meta.url), 'utf8'));
+const aiWorkspaceDatabase = aiWorkspaceDependency2;
+app.use('/api/report-workspace', aiWorkspaceDependency4.createAIWorkspaceRouter({
+  pool: aiWorkspaceDatabase, authenticateToken: aiWorkspaceDependency1,
+  aiRateLimiter: aiWorkspaceSupport.createWorkspaceLimiter(), features: aiWorkspaceFeatures,
+}));
 app.use((err, req, res, next) => {
   console.error('Error:', err);
   res.status(500).json({ error: 'Internal server error', message: err.message });
-});
-
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({ error: 'Route not found' });
 });
 
 // Initialize database and start server
@@ -100,27 +109,39 @@ async function startServer() {
     }
 
     
-// === Custom Feature Mounts (batch_06) ===
-import('./routes/customFeat01_AiPhotoEnhancementPipeline.js').then(m => app.use('/api/cf-ai-photo-enhancement-pipeline', m.default));
-import('./routes/customFeat02_ComputerVisionProductSizing.js').then(m => app.use('/api/cf-computer-vision-product-sizing', m.default));
-import('./routes/customFeat03_ReturnRiskPrediction.js').then(m => app.use('/api/cf-return-risk-prediction', m.default));
-import('./routes/customFeat04_MultiVariantGeneration.js').then(m => app.use('/api/cf-multi-variant-generation', m.default));
-import('./routes/customFeat05_CompetitiveVisualIntelligence.js').then(m => app.use('/api/cf-competitive-visual-intelligence', m.default));
+    // === Custom Feature Mounts (batch_06) ===
+    const featureMounts = [
+      ['./routes/customFeat01_AiPhotoEnhancementPipeline.js', '/api/cf-ai-photo-enhancement-pipeline'],
+      ['./routes/customFeat02_ComputerVisionProductSizing.js', '/api/cf-computer-vision-product-sizing'],
+      ['./routes/customFeat03_ReturnRiskPrediction.js', '/api/cf-return-risk-prediction'],
+      ['./routes/customFeat04_MultiVariantGeneration.js', '/api/cf-multi-variant-generation'],
+      ['./routes/customFeat05_CompetitiveVisualIntelligence.js', '/api/cf-competitive-visual-intelligence'],
+      ['./routes/gapFeat_all_the_ai.js', '/api/gap-all-the-ai'],
+      ['./routes/gapFeat_no_auto.js', '/api/gap-no-auto'],
+      ['./routes/gapFeat_no_competitor.js', '/api/gap-no-competitor'],
+      ['./routes/gapFeat_no_integration_with_e.js', '/api/gap-no-integration-with-e'],
+      ['./routes/gapFeat_no_batch_processing_endpoint_single.js', '/api/gap-no-batch-processing-endpoint-single'],
+      ['./routes/gapFeat_no_integration_with_image_cdn_delivery_optimizatio.js', '/api/gap-no-integration-with-image-cdn-delivery-optimizatio'],
+      ['./routes/gapFeat_limited_analytics_photo_performance_tracking.js', '/api/gap-limited-analytics-photo-performance-tracking'],
+      ['./routes/gapFeat_no_notifications_module_grep_0.js', '/api/gap-no-notifications-module-grep-0'],
+      ['./routes/gapFeat_no_audit_logging_grep_0.js', '/api/gap-no-audit-logging-grep-0'],
+      ['./routes/gapFeat_no_webhooks_for_image.js', '/api/gap-no-webhooks-for-image'],
+    ];
+    for (const [modPath, mountPath] of featureMounts) {
+      try {
+        const mod = await import(modPath);
+        app.use(mountPath, mod.default);
+      } catch (err) {
+        console.warn(`Could not mount ${mountPath}:`, err.message);
+      }
+    }
 
+    // 404 handler (must be after all routes, including the dynamically loaded feature/gap routes)
+    app.use((req, res) => {
+      res.status(404).json({ error: 'Route not found' });
+    });
 
-// === Batch 06 Gaps & Frontend Mounts (converted from require -> dynamic import) ===
-import('./routes/gapFeat_all_the_ai.js').then(m => app.use('/api/gap-all-the-ai', m.default)).catch(()=>{});
-import('./routes/gapFeat_no_auto.js').then(m => app.use('/api/gap-no-auto', m.default)).catch(()=>{});
-import('./routes/gapFeat_no_competitor.js').then(m => app.use('/api/gap-no-competitor', m.default)).catch(()=>{});
-import('./routes/gapFeat_no_integration_with_e.js').then(m => app.use('/api/gap-no-integration-with-e', m.default)).catch(()=>{});
-import('./routes/gapFeat_no_batch_processing_endpoint_single.js').then(m => app.use('/api/gap-no-batch-processing-endpoint-single', m.default)).catch(()=>{});
-import('./routes/gapFeat_no_integration_with_image_cdn_delivery_optimizatio.js').then(m => app.use('/api/gap-no-integration-with-image-cdn-delivery-optimizatio', m.default)).catch(()=>{});
-import('./routes/gapFeat_limited_analytics_photo_performance_tracking.js').then(m => app.use('/api/gap-limited-analytics-photo-performance-tracking', m.default)).catch(()=>{});
-import('./routes/gapFeat_no_notifications_module_grep_0.js').then(m => app.use('/api/gap-no-notifications-module-grep-0', m.default)).catch(()=>{});
-import('./routes/gapFeat_no_audit_logging_grep_0.js').then(m => app.use('/api/gap-no-audit-logging-grep-0', m.default)).catch(()=>{});
-import('./routes/gapFeat_no_webhooks_for_image.js').then(m => app.use('/api/gap-no-webhooks-for-image', m.default)).catch(()=>{});
-
-app.listen(PORT, () => {
+    app.listen(PORT, () => {
       console.log(`\nBackend server running on http://localhost:${PORT}`);
       console.log(`API endpoints available at /api/*`);
     });

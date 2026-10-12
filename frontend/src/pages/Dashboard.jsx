@@ -214,8 +214,8 @@ function Dashboard() {
 
   const fetchRecentActivity = async () => {
     try {
-      const response = await activityAPI.getRecent(8);
-      setRecentActivity(response.data);
+      const response = await activityAPI.getRecent(15);
+      setRecentActivity(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error('Error fetching activity:', error);
     } finally {

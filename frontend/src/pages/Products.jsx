@@ -30,7 +30,7 @@ function Products() {
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(12);
+  const [pageSize, setPageSize] = useState(15);
 
   // Sort
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
@@ -61,7 +61,7 @@ function Products() {
     try {
       const response = await productsAPI.getAll();
       // Handle both paginated {data, pagination} and legacy flat array responses
-      setProducts(Array.isArray(response.data) ? response.data : (response.data?.data || []));
+      setProducts(Array.isArray(response.data) ? response.data : (Array.isArray(response.data?.data) ? response.data.data : []));
     } catch (error) {
       toast.error('Failed to load products');
     } finally {

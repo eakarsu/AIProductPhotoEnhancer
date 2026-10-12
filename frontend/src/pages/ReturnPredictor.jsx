@@ -3,6 +3,7 @@ import { RotateCcw, Plus, Loader2, Sparkles, RefreshCw, Save, Edit2, Trash2, Ale
 import { returnPredictorAPI, productsAPI } from '../services/api';
 import Modal from '../components/Modal';
 import AIResultDisplay from '../components/AIResultDisplay';
+import NativeAIPresets from '../components/NativeAIPresets';
 import DataTable from '../components/DataTable';
 import { useToast } from '../components/Toast';
 import { useConfirm } from '../components/ConfirmDialog';
@@ -32,8 +33,8 @@ function ReturnPredictor() {
   const fetchData = async () => {
     try {
       const [itemsRes, productsRes] = await Promise.all([returnPredictorAPI.getAll(), productsAPI.getAll()]);
-      setItems(Array.isArray(itemsRes.data) ? itemsRes.data : (itemsRes.data?.data || []));
-      setProducts(Array.isArray(productsRes.data) ? productsRes.data : (productsRes.data?.data || []));
+      setItems(Array.isArray(itemsRes.data) ? itemsRes.data : (Array.isArray(itemsRes.data?.data) ? itemsRes.data.data : []));
+      setProducts(Array.isArray(productsRes.data) ? productsRes.data : (Array.isArray(productsRes.data?.data) ? productsRes.data.data : []));
     } catch (error) {
       toast.error('Failed to load data');
     } finally {
@@ -254,6 +255,7 @@ function ReturnPredictor() {
       {/* Create Form Modal */}
       <Modal isOpen={isFormModalOpen} onClose={() => setIsFormModalOpen(false)} title="New Return Prediction" size="md">
         <form onSubmit={handleSaveItem} className="space-y-4">
+          <NativeAIPresets page="ReturnPredictor" value={formData} onChange={setFormData} products={products} />
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-2">Select Product *</label>
             <select value={formData.product_id} onChange={(e) => setFormData({ ...formData, product_id: e.target.value })}

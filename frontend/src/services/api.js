@@ -34,6 +34,7 @@ api.interceptors.response.use(
 // Auth
 export const authAPI = {
   login: (email, password) => api.post('/auth/login', { email, password }),
+  demoLogin: () => api.post('/auth/demo-login'),
   register: (email, password, name) => api.post('/auth/register', { email, password, name }),
   logout: () => api.post('/auth/logout'),
   getMe: () => api.get('/auth/me'),
